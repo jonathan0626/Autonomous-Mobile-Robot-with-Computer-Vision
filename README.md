@@ -2,8 +2,9 @@
 
 An autonomous mobile robot project that combines **ROS**, **Arduino-based motor control**, and **OpenCV** for sensor-driven navigation and interactive human-robot behavior.
 
-<img width="404" height="343" alt="image" src="https://github.com/user-attachments/assets/93c93689-7b34-4f53-9a50-73bc2aaf39ed" />
-<img width="861" height="648" alt="image" src="https://github.com/user-attachments/assets/1afd5a1b-9041-4266-81a0-cad16234b656" />
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/93c93689-7b34-4f53-9a50-73bc2aaf39ed" width="700">
+</p>
 
 ---
 
