@@ -1,8 +1,7 @@
 # Autonomous Mobile Robot with Computer Vision
 
 An autonomous mobile robot project that combines **ROS**, **Arduino-based motor control**, and **OpenCV** for sensor-driven navigation and interactive human-robot behavior.
-<img width="1330" height="2364" alt="image" src="https://github.com/user-attachments/assets/8d82de13-08e0-458a-8192-f63aabaeecd0" />
-
+<img width="404" height="343" alt="image" src="https://github.com/user-attachments/assets/93c93689-7b34-4f53-9a50-73bc2aaf39ed" />
 
 ---
 
