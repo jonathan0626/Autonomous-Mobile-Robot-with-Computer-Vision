@@ -1,0 +1,88 @@
+<launch>
+
+  <!-- rosserial connection -->
+  <arg name="port" default="/dev/ttyACM0"/>
+  <arg name="baud" default="115200"/>
+
+  <node pkg="rosserial_python" type="serial_node.py" name="rosserial" output="screen">
+    <param name="port" value="$(arg port)"/>
+    <param name="baud" value="$(arg baud)"/>
+  </node>
+
+  <!-- vision + interaction -->
+  <node pkg="mobile_robot" type="smile_photo_node" name="smile_photo_node" output="screen">
+
+    <!-- camera -->
+    <param name="camera_device" value="/dev/video0"/>
+    <param name="width" value="1280"/>
+    <param name="height" value="720"/>
+    <param name="fps" value="30"/>
+    <param name="rotate180" value="1"/>
+
+    <!-- cascades -->
+    <param name="face_cascade"  value="/usr/share/opencv/haarcascades/haarcascade_frontalface_default.xml"/>
+    <param name="smile_cascade" value="/usr/share/opencv/haarcascades/haarcascade_smile.xml"/>
+    <param name="save_dir" value="/home/mobile_robot/photos"/>
+
+    <!-- patrol -->
+    <param name="patrol_enable" value="1"/>
+    <param name="turn_speed" value="0.35"/>
+    <param name="turn_duration" value="0.3"/>
+    <param name="pause_duration" value="2.70"/>
+    <param name="sweep_steps" value="999999"/>
+    <param name="patrol_only_when_wait_hand" value="1"/>
+
+    <!-- hand detection -->
+    <param name="require_hand" value="1"/>
+    <param name="hand_frames_required" value="4"/>
+    <param name="hand_area_min_ratio" value="0.0065"/>
+    <param name="hand_area_max_ratio" value="0.20"/>
+    <param name="hand_center_y_max_ratio" value="0.85"/>
+    <param name="motion_thresh" value="18"/>
+    <param name="motion_min_pixels" value="1200"/>
+
+    <!-- stabilization -->
+    <param name="pause_settle_sec" value="0.50"/>
+    <param name="motion_global_max_ratio" value="0.3"/>
+
+    <!-- smile detection -->
+    <param name="smile_frames_required" value="8"/>
+    <param name="smile_scale" value="1.10"/>
+    <param name="smile_neighbors" value="25"/>
+
+    <!-- framing -->
+    <param name="face_area_min_ratio" value="0.02"/>
+    <param name="face_area_max_ratio" value="0.35"/>
+    <param name="face_center_margin" value="0.18"/>
+
+    <param name="cooldown_sec" value="2"/>
+    <param name="log_hz" value="1.0"/>
+
+    <!-- auto approach -->
+    <param name="auto_adjust_enable" value="1"/>
+
+    <param name="approach_speed" value="0.15"/>
+    <param name="approach_step_sec" value="2"/>
+    <param name="approach_settle_sec" value="0.45"/>
+
+    <param name="no_person_frames_to_step" value="18"/>
+    <param name="framed_bad_frames_to_step" value="12"/>
+
+    <param name="approach_max_steps" value="30"/>
+
+    <!-- optional alignment -->
+    <param name="align_enable" value="0"/>
+    <param name="align_ang_speed" value="0.25"/>
+    <param name="align_step_sec" value="0.18"/>
+
+    <!-- optional retreat -->
+    <param name="retreat_enable" value="0"/>
+    <param name="retreat_speed" value="0.06"/>
+
+    <!-- fail safe -->
+    <param name="abort_on_fail" value="1"/>
+    <param name="abort_no_person_frames" value="300"/>
+
+  </node>
+
+</launch>

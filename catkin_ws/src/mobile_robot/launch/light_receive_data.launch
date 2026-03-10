@@ -1,0 +1,36 @@
+<launch>
+
+  <node pkg="rosserial_python" type="serial_node.py" name="connect_arduino" output="screen">
+    <param name="~port" value="/dev/ttyACM0"/>
+    <param name="~baud" value="115200"/>
+  </node>
+
+  <!-- Raspberry Pi control node -->
+  <node pkg="mobile_robot" type="lightreceivedata" name="rpi_light_nav" output="screen">
+    <env name="WIRINGPI_GPIOMEM" value="1"/>
+
+    <!-- light sensor thresholds -->
+    <param name="light_bright_thresh" value="200"/>
+    <param name="light_dark_thresh"  value="260"/>
+
+    <!-- turning direction / bump config -->
+    <param name="turn_right_positive" value="true"/>
+    <param name="bump_pull" value="0"/>
+
+    <!-- ignore strong ambient light -->
+    <param name="glare_factor" value="0.80"/>
+
+    <!-- small trim to keep robot straight -->
+    <param name="fwd_trim_left" value="0.05"/>
+
+    <!-- Beacon1_600 detection range -->
+    <param name="beacon_ratio_min" value="0.27"/>
+    <param name="beacon_ratio_max" value="0.32"/>
+
+    <!-- exit window for beacon tracking -->
+    <param name="beacon_exit_min" value="0.24"/>
+    <param name="beacon_exit_max" value="0.35"/>
+
+  </node>
+
+</launch>
