@@ -3,46 +3,44 @@
 #include <ros.h>
 #include <geometry_msgs/Twist.h>
 
-/* ===== 可調參數（動了就有感） ===== */
-const bool INVERT_LEFT  = false;    // 左輪方向反了就改 true
-const bool INVERT_RIGHT = false;    // 右輪方向反了就改 true
-const int  PWM_MAX      = 220;      // PWM 上限
+// PARAMETER SETTINGS
+const bool INVERT_LEFT  = false;    
+const bool INVERT_RIGHT = false;    
+const int  PWM_MAX      = 220;      
 
-// 針對不同動作給「最小門檻」（克服靜摩擦）
-const int  PWM_MIN_FWD  = 60;       // 直行
-const int  PWM_MIN_BACK = 90;       // 倒退
-const int  PWM_MIN_TURN = 80;       // 原地/單輪轉
+const int  PWM_MIN_FWD  = 60;       
+const int  PWM_MIN_BACK = 90;       
+const int  PWM_MIN_TURN = 80;       
 
-const int  MAX_SETPOINT = 260;      // cmd_vel=1.0 對應每100ms脈衝數
-const int  SAMPLE_MS    = 100;      // 取樣/更新週期
+const int  MAX_SETPOINT = 260;      // cmd_vel=1.0 
+const int  SAMPLE_MS    = 100;      
 
-// ★安全：多久沒收到 cmd_vel 就停車（ms）
 const unsigned long CMD_TIMEOUT_MS = 500;
 
-/* ===== L298N 腳位 ===== */
-const int enA = 5,  in1 = 8,  in2 = 9;     // 左輪
-const int enB = 6,  in3 = 10, in4 = 11;    // 右輪
+// L298N SETTINGS
+const int enA = 5,  in1 = 8,  in2 = 9;     // LEFT
+const int enB = 6,  in3 = 10, in4 = 11;    // RIGHT
 
-/* ===== 編碼器腳位（UNO: D2/D3 中斷） ===== */
-const byte encoderA_A = 2, encoderA_B = 4;   // 左：D2=INT0, D4
-const byte encoderB_A = 3, encoderB_B = 7;   // 右：D3=INT1, D7
+// UNO
+const byte encoderA_A = 2, encoderA_B = 4;   // LEFT：D2=INT0, D4
+const byte encoderB_A = 3, encoderB_B = 7;   // RIGHT：D3=INT1, D7
 volatile long countA = 0, countB = 0;
 volatile byte lastA = LOW, lastB = LOW;
 volatile bool dirA = true, dirB = true;
 
-/* ===== PID ===== */
+// PID
 double SetpointA=0, InputA=0, OutputA=0;
 double SetpointB=0, InputB=0, OutputB=0;
 double Kp=0.9, Ki=6.5, Kd=0.0;
 PID pidA(&InputA,&OutputA,&SetpointA,Kp,Ki,Kd,DIRECT);
 PID pidB(&InputB,&OutputB,&SetpointB,Kp,Ki,Kd,DIRECT);
 
-/* ===== ROS ===== */
+// ROS
 ros::NodeHandle nh;
 volatile float cmd_lin=0.0f, cmd_ang=0.0f;
 volatile unsigned long last_cmd_ms = 0;
 
-/* ===== 工具：依動作挑 PWM 最小門檻 ===== */
+
 inline int pickFloor(double sp, double lin, double ang){
   if (sp == 0) return 0;
   if (lin < -0.05 && fabs(ang) < 0.1) return PWM_MIN_BACK;
@@ -71,10 +69,9 @@ inline void stopMotors(){
   cmd_lin = 0; cmd_ang = 0;
   analogWrite(enA, 0);
   analogWrite(enB, 0);
-  // 方向腳位保持也行，這裡不強制改
 }
 
-/* ===== 編碼器 ISR ===== */
+// ISR
 void isrEncA(){
   int s=digitalRead(encoderA_A);
   if((lastA==LOW)&&(s==HIGH)) dirA=(digitalRead(encoderA_B)==HIGH);
@@ -86,7 +83,7 @@ void isrEncB(){
   lastB=s; if(!dirB) countB++; else countB--;
 }
 
-/* ===== /cmd_vel → 左右目標 ===== */
+// /cmd_vel
 void cmdVelCb(const geometry_msgs::Twist& m){
   last_cmd_ms = millis();
 
@@ -104,9 +101,8 @@ void cmdVelCb(const geometry_msgs::Twist& m){
 }
 ros::Subscriber<geometry_msgs::Twist> sub("/cmd_vel",&cmdVelCb);
 
-/* ===== PID 更新 ===== */
+
 void updatePID(){
-  // watchdog：太久沒收到 cmd_vel 就停
   if (millis() - last_cmd_ms > CMD_TIMEOUT_MS){
     stopMotors();
     return;
@@ -128,7 +124,7 @@ void updatePID(){
   setWheel(enB,in3,in4,SetpointB,pwmB,INVERT_RIGHT);
 }
 
-/* ===== 主程式 ===== */
+// MAIN CODE
 void setup(){
   pinMode(in1,OUTPUT); pinMode(in2,OUTPUT); pinMode(enA,OUTPUT);
   pinMode(in3,OUTPUT); pinMode(in4,OUTPUT); pinMode(enB,OUTPUT);
